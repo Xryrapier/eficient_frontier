@@ -1,5 +1,5 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='eficient_frontier',
       description="project package for eficient frontier",
-      packages=["eficient_frontier"])
+      packages=find_packages(exclude=['test']))
