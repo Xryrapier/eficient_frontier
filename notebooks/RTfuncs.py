@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from pandas.plotting import scatter_matrix
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def calculate_risk_tolerance(dataset):
@@ -10,10 +11,6 @@ def calculate_risk_tolerance(dataset):
     dataset['Risky'] = dataset['NMMF'] + dataset['STOCKS'] + dataset['BOND']
     dataset['RT'] = dataset['Risky'] / (dataset['Risky'] + dataset['RiskFree'])
     return dataset
-
-def copy_and_show_head(dataset):
-    dataset2 = copy.deepcopy(dataset)
-    return dataset2
 
 def clean_dataset(dataset):
     dataset_cleaned = dataset.dropna(axis=0)
@@ -27,6 +24,15 @@ def select_and_drop_columns(dataset, keep_list):
     drop_list = [col for col in dataset.columns if col not in keep_list]
     dataset_cleaned = dataset.drop(labels=drop_list, axis=1, inplace=False)
     return dataset_cleaned
+
+def plot_histogram(dataframe, column_name):
+    sns.distplot(dataframe[column_name], hist=True, kde=False,
+                 bins=int(180/5), color='blue',
+                 hist_kws={'edgecolor': 'black'})
+    plt.xlabel(column_name)
+    plt.ylabel('Frequency')
+    plt.title(f'Histogram of {column_name}')
+    plt.show()
 
 def plot_scatter_matrix(dataset, figsize=(15, 15)):
     scatter_matrix(dataset, figsize=figsize)
