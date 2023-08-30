@@ -4,11 +4,12 @@ import numpy as np
 from tqdm import tqdm
 import pickle as pkl
 from datetime import datetime, timedelta
+from  pathlib import Path
+from eficient_frontier.params import *
 
 
 def update_sp500_data():
-
-    constituents_df = pd.read_csv('/home/mina/code/Xryrapier/eficient_frontier/raw_data/constituents_csv.csv')
+    constituents_df = pd.read_csv(ROOT_DIR +'/raw_data/constituents_csv.csv')
     today = datetime.now().date()
     start_date = '2010-01-01'
     end_date = today
@@ -25,8 +26,8 @@ def update_sp500_data():
     with open('sp500_all.pkl', 'wb') as f:
         pkl.dump([tickers, ladj], f)
 
-def get_sp500_data ():
-    with open('/home/mina/code/Xryrapier/eficient_frontier/raw_data/sp500_all.pkl'
-, 'rb') as f:
+def get_sp500_data():
+    with open(ROOT_DIR + '/raw_data/sp500_all.pkl' , 'rb') as f:
+        print(type(f))
         sp500_all = pkl.load(f)
     return sp500_all[0], sp500_all[1]

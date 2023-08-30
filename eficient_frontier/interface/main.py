@@ -2,10 +2,11 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from dateutil.parser import parse
-from ml_logic.data import *
-from ml_logic.preprocessor import *
-from ml_logic.model import *
-
+from eficient_frontier.ml_logic.data import *
+from eficient_frontier.ml_logic.preprocessor import *
+from eficient_frontier.ml_logic.model import *
+from eficient_frontier.ml_logic.sp500_data import get_sp500_data
+from eficient_frontier.params import *
 
 # def preprocess_and_train():
 #     """

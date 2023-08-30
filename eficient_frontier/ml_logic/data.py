@@ -1,6 +1,7 @@
 import pandas as pd
 from pathlib import Path
 from ml_logic.five_best_stock import *
+from eficient_frontier.params import *
 
 def get_best_5_stock(tickers, sp500_data):
     """
