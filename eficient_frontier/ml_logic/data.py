@@ -1,5 +1,6 @@
 import pandas as pd
 from pathlib import Path
+from RTfuncs import *
 from eficient_frontier.ml_logic.five_best_stock import *
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import RobustScaler
@@ -44,74 +45,59 @@ def clean_data(data: pd.DataFrame) -> pd.DataFrame:
     - irrelevant transactions
     """
     # Selecting some columns of interest
-    selected_features = ['YY1',
-                         'HHSEX',
-                         'AGE',
-                         'AGECL',
-                         'EDCL',
-                         'MARRIED',
-                         'KIDS',
-                         'FAMSTRUCT',
-                         'OCCAT1',
-                         'INCOME',
-                         'WSAVED',
-                         'YESFINRISK',
-                         'NETWORTH',
-                         'LIQ',
-                         'CDS',
-                         'SAVBND',
-                         'CASHLI',
-                         'NMMF',
-                         'STOCKS',
-                         'BOND']
+    selected_features = ['HHSEX',
+                        'AGE',
+                        'EDCL',
+                        'MARRIED',
+                        'KIDS',
+                        'FAMSTRUCT',
+                        'OCCAT1',
+                        'INCOME',
+                        'WSAVED',
+                        'YESFINRISK',
+                        'NETWORTH',
+                        'LIQ',
+                        'CDS',
+                        'SAVBND',
+                        'CASHLI',
+                        'NMMF',
+                        'STOCKS',
+                        'BOND']
 
     # Overwriting the "data" variable to keep only the columns of interest
     data = data[selected_features].copy()
 
-    # Drop diplicates
+    #Adding a new column (target)
+    data = calculate_risk_tolerance(data)
+
+    # Dropping columns we don't need
+    data.drop(columns = ["RiskFree"], inplace = True)
+    data.drop(columns = ["Risky"], inplace = True)
+    data.drop(columns = ["LIQ"], inplace = True)
+    data.drop(columns = ["CDS"], inplace = True)
+    data.drop(columns = ["SAVBND"], inplace = True)
+    data.drop(columns = ["CASHLI"], inplace = True)
+    data.drop(columns = ["NMMF"], inplace = True)
+    data.drop(columns = ["STOCKS"], inplace = True)
+    data.drop(columns = ["BOND"], inplace = True)
+
+    # Dropping diplicates
     data = data.drop_duplicates()
 
-    # Data Transformation
-    st_scaler = StandardScaler()
-    data['AGE'] = st_scaler.fit_transform(data[['AGE']])
+    # Dropping missing data
+    data = data.dropna(subset=['RT'])
 
-    rb_scaler = RobustScaler()
-    data['KIDS'] = rb_scaler.fit_transform(data[['KIDS']])
-    data['INCOME'] = rb_scaler.fit_transform(data[['INCOME']])
-    data['NETWORTH'] = rb_scaler.fit_transform(data[['NETWORTH']])
+    # Getting rid of outliers (very high income)
+    q1_income = data['INCOME'].describe()['25%']
+    q3_income = data['INCOME'].describe()['75%']
 
-    # Perform one-hot encoding on categorical columns
-    ohe = OneHotEncoder(sparse_output = False)
-    ohe.fit(data[['HHSEX']])
-    ohe.categories_
-    ohe.get_feature_names_out()
-    data[ohe.get_feature_names_out()] = ohe.transform(data[['HHSEX']])
-    data.drop(columns = ["HHSEX"], inplace = True)
+    iqr_income = q3_income - q1_income
+    lower_bound = np.max([q1_income - 1.5*iqr_income,0])
+    upper_bound = q3_income + 1.5*iqr_income
 
-    ohe.fit(data[['AGECL']])
-    data[ohe.get_feature_names_out()] = ohe.transform(data[['AGECL']])
-    data.drop(columns = ["AGECL"], inplace = True)
-
-    ohe.fit(data[['EDCL']])
-    data[ohe.get_feature_names_out()] = ohe.transform(data[['EDCL']])
-    data.drop(columns = ["EDCL"], inplace = True)
-
-    ohe.fit(data[['MARRIED']])
-    data[ohe.get_feature_names_out()] = ohe.transform(data[['MARRIED']])
-    data.drop(columns = ["MARRIED"], inplace = True)
-
-    ohe.fit(data[['FAMSTRUCT']])
-    data[ohe.get_feature_names_out()] = ohe.transform(data[['FAMSTRUCT']])
-    data.drop(columns = ["FAMSTRUCT"], inplace = True)
-
-    ohe.fit(data[['OCCAT1']])
-    data[ohe.get_feature_names_out()] = ohe.transform(data[['OCCAT1']])
-    data.drop(columns = ["OCCAT1"], inplace = True)
-
-    ohe.fit(data[['WSAVED']])
-    data[ohe.get_feature_names_out()] = ohe.transform(data[['WSAVED']])
-    data.drop(columns = ["WSAVED"], inplace = True)
+    normal_people = data['INCOME'] < upper_bound
+    data_normal = data[normal_people]
 
     print("✅ data cleaned")
 
-    return data.shape
+    return data_normal
