@@ -13,7 +13,8 @@ from pandas.tseries.offsets import BDay
 import random
 import matplotlib as mpl
 import seaborn as sns
-from ml_logic.sp500_data import get_sp500_data
+from eficient_frontier.ml_logic.sp500_data import get_sp500_data
+from eficient_frontier.params import *
 
 
 def get_clustered_groups (ndays=180, plot=True, nk = 4):
