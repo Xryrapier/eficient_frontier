@@ -15,8 +15,7 @@ from sklearn.compose import ColumnTransformer, make_column_transformer
 from sklearn.compose import make_column_selector
 
 
-def preprocess_features(data_normal: pd.DataFrame) -> np.ndarray:
-    def create_sklearn_preprocessor() -> ColumnTransformer:
+def preprocess_features() -> ColumnTransformer:
         """
         Scikit-learn pipeline that transforms a cleaned dataset
         into a preprocessed one.
@@ -67,20 +66,20 @@ def preprocess_features(data_normal: pd.DataFrame) -> np.ndarray:
 
         return final_preprocessor
 
-    print("\nPreprocessing features...")
 
+def preprocess(data_normal: pd.DataFrame) -> np.ndarray:
+
+    print("\nPreprocessing features...")
     # Train test split
     y = data_normal['RT']
     X = data_normal.drop(columns=['RT'])
-
+    preprocessor = preprocess_features()
+    preprocessor.fit(X)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
-
-    preprocessor = create_sklearn_preprocessor()
-    preprocessor.fit(X_train)
     X_train_preprocessed = preprocessor.transform(X_train)
     X_test_preprocessed = preprocessor.transform(X_test)
 
     print("✅ X_train_preprocessed, with shape", X_train_preprocessed.shape)
     print("✅ X_test_preprocessed, with shape", X_test_preprocessed.shape)
 
-    return X_train_preprocessed, X_test_preprocessed, y_train, y_test
+    return X_train_preprocessed, X_test_preprocessed, y_train, y_test, preprocessor

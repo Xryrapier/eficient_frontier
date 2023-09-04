@@ -16,14 +16,15 @@ from pandas.tseries.offsets import BDay
 import random
 import matplotlib as mpl
 import seaborn as sns
-# TODO: Document 
+from eficient_frontier.params import *
+# TODO: Document
 
 def update_sp500_data():
 
-    constituents_df = pd.read_csv('constituents_csv.csv')
+    constituents_df = pd.read_csv(ROOT_DIR+'/eficient_frontier/raw_data/constituents_csv.csv')
     today = datetime.now().date()
     start_date = '2010-01-01'
-    end_date = today 
+    end_date = today
     ladj = []
     tickers=[]
     for ticker in tqdm(list(constituents_df['Symbol'])):
@@ -38,7 +39,7 @@ def update_sp500_data():
         pkl.dump([tickers, ladj], f)
 
 def get_sp500_data ():
-    with open('/home/xryrapier/code/xryrpapier/eficient_frontier/raw_data/sp500_all.pkl', 'rb') as f:
+    with open(ROOT_DIR+'/eficient_frontier/raw_data/sp500_all.pkl', 'rb') as f:
         sp500_all = pkl.load(f)
     return sp500_all[0], sp500_all[1]
 
@@ -53,7 +54,7 @@ def get_clustered_groups (ndays=180, plot=True, nk = 4):
         ladj.append(t['adjclose'][-ndays:])
 
     df = pd.concat(ladj,axis=1,keys=tickers)
- 
+
     ladj2=[]
     for t in tqdm(sp500_data):
         ladj2.append(t['volume'][:])
@@ -86,7 +87,7 @@ def get_clustered_groups (ndays=180, plot=True, nk = 4):
         plt.xlabel("Value of k")
         plt.ylabel("Distortion")
         plt.show()
-    
+
     X = ret_var.values
     kmeans =KMeans(n_clusters = nk).fit(X)
     centroids = kmeans.cluster_centers_
@@ -94,12 +95,12 @@ def get_clustered_groups (ndays=180, plot=True, nk = 4):
     if plot:
         plt.figure(figsize=(10,10))
         cmap = mpl.colors.ListedColormap(["navy", "crimson", "limegreen", "gold"])
-        norm = mpl.colors.BoundaryNorm(np.arange(-0.5,4), cmap.N) 
+        norm = mpl.colors.BoundaryNorm(np.arange(-0.5,4), cmap.N)
 
         scatter = plt.scatter(X[:,0],X[:,1], c = kmeans.labels_, cmap =cmap,norm=norm, s=150*Vol)
         plt.xlabel("returns", fontsize=16)
         plt.ylabel("std dev",fontsize = 16)
-        
+
         plt.scatter(centroids[:,0], centroids[:,1],color="green",marker="*")
 
         for i, ticker in enumerate(top_stock_tickers):
@@ -108,7 +109,7 @@ def get_clustered_groups (ndays=180, plot=True, nk = 4):
         # Crear una leyenda personalizada
         cbar = plt.colorbar(scatter, ticks=np.linspace(0,3,4))
         cbar.set_label('Groups')  # Etiqueta de la leyenda
-        
+
         plt.show()
 
     y_predkmeans = pd.DataFrame(kmeans.predict(X))
@@ -216,7 +217,7 @@ def efficient_frontier_from_df(df, plot=False,npts = 80):
     return [efficient_frontier_df, min_std_point, max_sharpe_point, max_weighted_sharpe_point]
 
 def get_optimal_portfolio(ticker_list, ndays=180):
-    # get data 
+    # get data
     tickers, sp500_data = get_sp500_data()
     ladj2 = []
     ltick = []
@@ -243,19 +244,19 @@ def get_optimal_portfolio(ticker_list, ndays=180):
         selected_columns = list(combo)
         combo_correlation = correlation_matrix.loc[selected_columns, selected_columns]
         corr_means.append(combo_correlation.values.mean())
-    
+
         #if (combo_correlation.values.mean() <= correlation_threshold):
         combo_df = df[selected_columns].copy()
         selected_dataframes.append(combo_df)
 
     n = 100
-    
+
     correlation_dataframes = list(zip(corr_means, selected_dataframes))
 
     sorted_correlation_dataframes = sorted(correlation_dataframes, key=lambda x: x[0])
 
     selected_dataframes = [df for _, df in sorted_correlation_dataframes[:n]]
-    
+
 
 
     print("Number of selected combinations:", len(selected_dataframes))
@@ -273,7 +274,7 @@ def get_optimal_portfolio(ticker_list, ndays=180):
         returns.append(g[0]['Return'])
     idx = np.argmax(returns)
     res = efficient_frontier_from_df(selected_dataframes[idx], plot=True, npts = 80)
-    return res, selected_dataframes[idx], 
+    return res, selected_dataframes[idx],
 
 def get_portfolio_stock_components(minRiskWeights, sel_tickers,df, investment=1e5):
     #sel_tickers = list(res_portfolio[1].columns)
@@ -281,7 +282,7 @@ def get_portfolio_stock_components(minRiskWeights, sel_tickers,df, investment=1e
     for tick in sel_tickers:
         prices.append(df[tick][-1])
     n_actions = []
-    
+
     for i in range(5):
         amount = investment * minRiskWeights[i]
         nac = round(amount/prices[i])
@@ -415,5 +416,3 @@ def get_actions_opt_portfolio(ndays, invest, sigma = None):
         return opt_portfolio, sigma_pd
     else:
         return opt_portfolio
-
-

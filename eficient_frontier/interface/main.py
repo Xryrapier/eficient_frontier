@@ -4,10 +4,11 @@ from pathlib import Path
 from dateutil.parser import parse
 from ml_logic.data import *
 from ml_logic.preprocessor import *
-from ml_logic.model import *
 from tqdm import tqdm
-from eficient_frontier.ml_logic.finfuncs import get_sp500_data, get_clustered_groups, get_optimal_portfolio, get_portfolio_stock_components
-
+from eficient_frontier.ml_logic.finfuncs import *
+import sys
+import traceback
+import ipdb
 def get_actions_opt_portfolio(ndays, invest, sigma = None):
     """
     Generate an optimal portfolio of stocks based on given criteria.
@@ -31,7 +32,7 @@ def get_actions_opt_portfolio(ndays, invest, sigma = None):
     Example:
     - opt_portfolio, sigma_pd = get_actions_opt_portfolio(ndays=30, invest=10000, sigma=0.2)
     """
-    
+
     tickers, sp500_data = get_sp500_data()
     ladj = []
     print('Reading data:')
@@ -88,67 +89,82 @@ def get_actions_opt_portfolio(ndays, invest, sigma = None):
         return opt_portfolio, sigma_pd
     else:
         return opt_portfolio
-    
+
     print("\n ⭐️ get_actions_opt_portfolio")
 
-# def preprocess_and_train():
+def preproces_train_evaluate_save_model():
 #     """
 #     - Clean and preprocess data
-#     - Train a Keras model on it
+#     - Train a model on it
 #     - Save the model
 #     - Compute & save a validation performance metric
 #     """
+    print("\n ⭐️ Loading Data")
+    path = '/home/mina/code/Xryrapier/eficient_frontier/raw_data/SCFP2019.csv'
+    data = pd.read_csv(path)
+    # Selecting some columns of interest
+    selected_features = ['HHSEX',
+                     'AGE',
+                     'EDCL',
+                     'MARRIED',
+                     'KIDS',
+                     'FAMSTRUCT',
+                     'OCCAT1',
+                     'INCOME',
+                     'WSAVED',
+                     'YESFINRISK',
+                     'NETWORTH',
+                     'LIQ',
+                     'CDS',
+                     'SAVBND',
+                     'CASHLI',
+                     'NMMF',
+                     'STOCKS',
+                     'BOND']
 
-#     print("\n ⭐️ preprocess_and_train")
+    data = data[selected_features].copy()
+
+    print("✅ Loading Data done")
+    print("\n ⭐️ preprocessing and training and evaluating and saving model done")
+
+    data=clean_data(data)
+    X_train_preprocessed, X_test_preprocessed, y_train, y_test, preprocessor = preprocess(data)
+    model= create_and_fit_model(X_train_preprocessed, y_train,\
+        ExtraTreesRegressor, n_estimators=300, max_depth=30, min_samples_split=2, min_samples_leaf=1)
+    mse, r2 = evaluate_regression_model(model, X_test_preprocessed, y_test)
+    print("Mean Squared Error:", mse)
+    print("R^2 Score:", r2)
+    model_filename = 'finalized_model.sav'
+    preprocessor_filename = 'finalized_preprocessor.sav'
+    save_model_to_pickle(model, model_filename)
+    save_model_to_pickle(preprocessor, preprocessor_filename)
+    print("✅ preprocessing and training and evaluating and saving model done")
 
 
-#     # Clean data using data.py
-#     data=clean_data(data)
+def pred(X_pred: pd.DataFrame = None) -> np.ndarray:
+    print("\n ⭐️  loading model and prediction" )
+    model_path_name = '/home/mina/code/Xryrapier/eficient_frontier/finalized_model.sav'
+    model = load(open(model_path_name, 'rb'))
+    preprocessor_path_name = '/home/mina/code/Xryrapier/eficient_frontier/finalized_preprocessor.sav'
+    preprocessor = load(open(preprocessor_path_name, 'rb'))
 
-#     # Create (X_train, y_train, X_val, y_val) without data leaks
+    X_pred_preprocessed = preprocessor.transform(X_pred)
+    y_pred = model.predict(X_pred_preprocessed)
 
-
-#     # Create (X_train_processed, X_val_processed) using `preprocessor.py`
-#     X_train_processed= preprocess_features("X_train")
-#     X_val_processed=preprocess_features("X_val")
-
-#     # Train a model on the training set, using `model.py`
-#     model = None
-#     model = initialize_model(input_shape=X_train_processed.shape[1:])
-#     model , history = train_model(model,X_train_processed,"y_train" , validation_data=(X_val_processed,"y_val"))
-
-#     # Save trained model
-#     pass #your code here
-
-#     print("✅ preprocess_and_train() done")
-
-
-# def pred(X_pred: pd.DataFrame = None) -> np.ndarray:
-#     print("\n ⭐️  pred" )
-
-#     if X_pred is None:
-#         X_pred = pd.DataFrame(dict(
-#             # defualt data to predict
-#         ))
-
-#     model = load_model()
-#     X_processed = preprocess_features(X_pred)
-#     y_pred = model.predict(X_processed)
-
-#     print(f"✅ pred() done")
-
-#     return y_pred
+    print(f"✅ loading model and prediction done")
+    return y_pred
 
 
 if __name__ == '__main__':
     try:
-        tickers, sp500_data = get_sp500_data()
-        get_best_5_stock(tickers, sp500_data)
-    except:
-        import sys
-        import traceback
+        X_pred=pd.DataFrame([[2, 32, 4, 1, 0, 5, 4, 2000, 6, 0, 8000]] ,\
+            columns=['HHSEX', 'AGE', 'EDCL', 'MARRIED', 'KIDS', 'FAMSTRUCT', 'OCCAT1','INCOME', 'WSAVED', 'YESFINRISK', 'NETWORTH'])
+        preproces_train_evaluate_save_model()
+        sigma = pred(X_pred)
 
-        import ipdb
+        fin_pd, res = get_actions_opt_portfolio(ndays=10, invest=100000, sigma = sigma)
+        print(fin_pd)
+    except:
         extype, value, tb = sys.exc_info()
         traceback.print_exc()
         ipdb.post_mortem(tb)
