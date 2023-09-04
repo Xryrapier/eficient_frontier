@@ -38,7 +38,7 @@ def update_sp500_data():
         pkl.dump([tickers, ladj], f)
 
 def get_sp500_data ():
-    with open('/home/xryrapier/code/xryrpapier/eficient_frontier/raw_data/sp500_all.pkl', 'rb') as f:
+    with open('/home/xryrapier/code/xryrapier/eficient_frontier/raw_data/sp500_all.pkl', 'rb') as f:
         sp500_all = pkl.load(f)
     return sp500_all[0], sp500_all[1]
 
@@ -248,7 +248,7 @@ def get_optimal_portfolio(ticker_list, ndays=180):
         combo_df = df[selected_columns].copy()
         selected_dataframes.append(combo_df)
 
-    n = 100
+    n = 10
     
     correlation_dataframes = list(zip(corr_means, selected_dataframes))
 
