@@ -39,7 +39,17 @@ app.state.model = load(open(model_path_name, 'rb'))
 
 @app.get("/predict")
 def predict(
-
+    HHSEX: int,
+    AGE: int,
+    EDCL: int,
+    MARRIED: int,
+    KIDS: int,
+    FAMSTRUCT: int,
+    OCCAT1: int,
+    INCOME: float,
+    WSAVED: int,
+    YESFINRISK: int,
+    NETWORTH: float
 ):
     """
     Make a single course prediction.
@@ -48,10 +58,13 @@ def predict(
     """
     # $CHA_BEGIN
 
-    X_pred=pd.DataFrame([[2, 32, 4, 1, 0, 5, 4, 2000, 6, 0, 8000]] ,\
-                columns=['HHSEX', 'AGE', 'EDCL', 'MARRIED', 'KIDS', 'FAMSTRUCT', 'OCCAT1','INCOME', 'WSAVED', 'YESFINRISK', 'NETWORTH'])
+    # For test:
+    # X_pred=pd.DataFrame([[2, 32, 4, 1, 0, 5, 4, 2000, 6, 0, 8000]] ,\
+    #             columns=['HHSEX', 'AGE', 'EDCL', 'MARRIED', 'KIDS', 'FAMSTRUCT', 'OCCAT1','INCOME', 'WSAVED', 'YESFINRISK', 'NETWORTH'])
 
-    sigma = pred(X_pred)
+    X_pred_api = pd.DataFrame(locals(), index=[0])
+
+    sigma = pred(X_pred_api)
     fin_pd, res = get_actions_opt_portfolio(ndays=20, invest=100000, sigma = sigma)
 
     # ⚠️ fastapi only accepts simple Python data types as a return value

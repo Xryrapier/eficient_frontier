@@ -44,7 +44,7 @@ def get_sp500_data ():
     return sp500_all[0], sp500_all[1]
 
 
-def get_clustered_groups (ndays=180, plot=True, nk = 4):
+def get_clustered_groups (ndays=180, plot=False, nk = 4):
     # load tickers and sp500 data and get dataframe with close prices
     tickers, sp500_data = get_sp500_data()
     ladj = []
