@@ -62,9 +62,9 @@ def predict(
     # X_pred=pd.DataFrame([[2, 32, 4, 1, 0, 5, 4, 2000, 6, 0, 8000]] ,\
     #             columns=['HHSEX', 'AGE', 'EDCL', 'MARRIED', 'KIDS', 'FAMSTRUCT', 'OCCAT1','INCOME', 'WSAVED', 'YESFINRISK', 'NETWORTH'])
 
-    X_pred = pd.DataFrame(locals(), index=[0])
+    X_pred_api = pd.DataFrame(locals(), index=[0])
 
-    sigma = pred(X_pred)
+    sigma = pred(X_pred_api)
     fin_pd, res = get_actions_opt_portfolio(ndays=20, invest=100000, sigma = sigma)
 
     # ⚠️ fastapi only accepts simple Python data types as a return value
