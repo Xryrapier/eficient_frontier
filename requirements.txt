@@ -166,3 +166,6 @@ Werkzeug==2.3.7
 wrapt==1.15.0
 yahoo-fin==0.8.9.1
 zipp==3.16.2
+uvicorn==0.23.2
+statsmodels==0.14.0
+fastapi==0.103.1
