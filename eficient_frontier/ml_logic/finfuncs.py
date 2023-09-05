@@ -249,7 +249,7 @@ def get_optimal_portfolio(ticker_list, ndays=180):
         combo_df = df[selected_columns].copy()
         selected_dataframes.append(combo_df)
 
-    n = 1
+    n = 100
 
     correlation_dataframes = list(zip(corr_means, selected_dataframes))
 
