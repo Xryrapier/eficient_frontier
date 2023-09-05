@@ -273,7 +273,7 @@ def get_optimal_portfolio(ticker_list, ndays=180):
     for g in gather_results:
         returns.append(g[0]['Return'])
     idx = np.argmax(returns)
-    res = efficient_frontier_from_df(selected_dataframes[idx], plot=True, npts = 80)
+    res = efficient_frontier_from_df(selected_dataframes[idx], plot=False, npts = 80)
     return res, selected_dataframes[idx],
 
 def get_portfolio_stock_components(minRiskWeights, sel_tickers,df, investment=1e5):
