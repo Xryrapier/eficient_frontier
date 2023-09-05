@@ -44,7 +44,7 @@ def get_sp500_data ():
     return sp500_all[0], sp500_all[1]
 
 
-def get_clustered_groups (ndays=180, plot=True, nk = 4):
+def get_clustered_groups (ndays=180, plot=False, nk = 4):
     # load tickers and sp500 data and get dataframe with close prices
     tickers, sp500_data = get_sp500_data()
     ladj = []
@@ -249,7 +249,7 @@ def get_optimal_portfolio(ticker_list, ndays=180):
         combo_df = df[selected_columns].copy()
         selected_dataframes.append(combo_df)
 
-    n = 100
+    n = 1
 
     correlation_dataframes = list(zip(corr_means, selected_dataframes))
 
@@ -273,7 +273,7 @@ def get_optimal_portfolio(ticker_list, ndays=180):
     for g in gather_results:
         returns.append(g[0]['Return'])
     idx = np.argmax(returns)
-    res = efficient_frontier_from_df(selected_dataframes[idx], plot=True, npts = 80)
+    res = efficient_frontier_from_df(selected_dataframes[idx], plot=False, npts = 80)
     return res, selected_dataframes[idx],
 
 def get_portfolio_stock_components(minRiskWeights, sel_tickers,df, investment=1e5):

@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from dateutil.parser import parse
-from ml_logic.data import *
-from ml_logic.preprocessor import *
+from eficient_frontier.ml_logic.data import *
+from eficient_frontier.ml_logic.preprocessor import *
 from tqdm import tqdm
 from eficient_frontier.ml_logic.finfuncs import *
 import sys
@@ -100,7 +100,7 @@ def preproces_train_evaluate_save_model():
 #     - Compute & save a validation performance metric
 #     """
     print("\n ⭐️ Loading Data")
-    path = '/home/mina/code/Xryrapier/eficient_frontier/raw_data/SCFP2019.csv'
+    path = os.path.expanduser('~')+'/code/Xryrapier/eficient_frontier/raw_data/SCFP2019.csv'
     data = pd.read_csv(path)
     # Selecting some columns of interest
     selected_features = ['HHSEX',
@@ -143,9 +143,9 @@ def preproces_train_evaluate_save_model():
 
 def pred(X_pred: pd.DataFrame = None) -> np.ndarray:
     print("\n ⭐️  loading model and prediction" )
-    model_path_name = '/home/mina/code/Xryrapier/eficient_frontier/finalized_model.sav'
+    model_path_name = os.path.expanduser('~')+'/code/Xryrapier/eficient_frontier/finalized_model.sav'
     model = load(open(model_path_name, 'rb'))
-    preprocessor_path_name = '/home/mina/code/Xryrapier/eficient_frontier/finalized_preprocessor.sav'
+    preprocessor_path_name = os.path.expanduser('~')+'/code/Xryrapier/eficient_frontier/finalized_preprocessor.sav'
     preprocessor = load(open(preprocessor_path_name, 'rb'))
 
     X_pred_preprocessed = preprocessor.transform(X_pred)
