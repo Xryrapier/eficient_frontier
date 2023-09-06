@@ -1,12 +1,10 @@
 import streamlit as st
-from  params import *
 import pandas as pd
 import numpy as np
 import os
-from ml_logic.data import *
-from ml_logic.preprocessor import *
-from ml_logic.finfuncs import *
-from params import *
+from eficient_frontier.ml_logic.data import *
+from eficient_frontier.ml_logic.preprocessor import *
+from eficient_frontier.ml_logic.finfuncs import *
 import requests
 import time
 
@@ -32,22 +30,22 @@ features = {
 
 
 
-investors = pd.read_csv(ROOT_DIR+'/eficient_frontier/raw_data/InputData.csv', index_col = 0 )
-assets = pd.read_csv(ROOT_DIR+'/eficient_frontier/raw_data/SP500Data.csv',index_col=0)
-missing_fractions = assets.isnull().mean().sort_values(ascending=False)
-drop_list = sorted(list(missing_fractions[missing_fractions > 0.3].index))
-assets.drop(labels=drop_list, axis=1, inplace=True)
-# Fill the missing values with the last value available in the dataset.
-assets=assets.fillna(method='ffill')
-options=np.array(assets.columns)
-# str(options)
-options = []
-for tic in assets.columns:
-    #{'label': 'user sees', 'value': 'script sees'}
-    mydict = {}
-    mydict['label'] = tic #Apple Co. AAPL
-    mydict['value'] = tic
-    options.append(mydict['label'])
+# investors = pd.read_csv(ROOT_DIR+'/eficient_frontier/raw_data/InputData.csv', index_col = 0 )
+# assets = pd.read_csv(ROOT_DIR+'/eficient_frontier/raw_data/SP500Data.csv',index_col=0)
+# missing_fractions = assets.isnull().mean().sort_values(ascending=False)
+# drop_list = sorted(list(missing_fractions[missing_fractions > 0.3].index))
+# assets.drop(labels=drop_list, axis=1, inplace=True)
+# # Fill the missing values with the last value available in the dataset.
+# assets=assets.fillna(method='ffill')
+# options=np.array(assets.columns)
+# # str(options)
+# options = []
+# for tic in assets.columns:
+#     #{'label': 'user sees', 'value': 'script sees'}
+#     mydict = {}
+#     mydict['label'] = tic #Apple Co. AAPL
+#     mydict['value'] = tic
+#     options.append(mydict['label'])
 
 
 
@@ -57,6 +55,21 @@ for tic in assets.columns:
 st.title('Robo Advisor Dashboard')
 
 st.markdown('### Enter Investor and Investment Characteristics')
+
+st.markdown(
+    """
+    <style>
+    .appview-container {
+      background-image: url('https://cutewallpaper.org/25/animated-purple-wallpaper/224215627.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 age = st.slider('Age', min_value=features['AGE']['min'], max_value=features['AGE']['max'])
 gender = st.radio("Gender", ["Male", "Female"])
@@ -144,7 +157,9 @@ if submit_button:
     sigma =np.round(prediction["sigma"][0]*100,2)
     st.text_input('Risk tolerance (Scale of 100)', value=sigma, key='risk_tolerance_input')
 
-
     st.markdown('#### Asset Allocation and Portfolio Performance')
-    ticker_symbols = st.multiselect('Best assets for the portfolio', options=fin_pd["Ticker"] , default=fin_pd["Ticker"])
-    st.bar_chart(fin_pd.set_index('Ticker')['Number of actions'] ,  width=300 ,height=270,color="#ff4b4b")
+    st.multiselect('Best assets for the portfolio', options=fin_pd["Ticker"], default=fin_pd["Ticker"])
+
+    fin_pd['Number of actions'] = fin_pd['Number of actions'].apply(lambda x: int(x))
+    fin_pd.drop(columns = ['Weight'], inplace = True)
+    st.bar_chart(fin_pd.set_index('Ticker')['Number of actions'], width=300, height=270, color="#ff4b4b")
