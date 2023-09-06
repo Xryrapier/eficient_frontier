@@ -57,6 +57,10 @@ st.markdown('### Enter Investor and Investment Characteristics')
 st.markdown(
     """
     <style>
+    .appview-container h1, .appview-container span, .appview-container label, .appview-container p, .appview-container {
+      color: white !important;
+    }
+
     .appview-container {
       background-image: url('https://4kwallpapers.com/images/wallpapers/purple-light-geometric-glowing-lines-minimalist-5k-5120x2880-6724.jpg');
       background-size: cover;
@@ -67,6 +71,11 @@ st.markdown(
       display: flex;
       justify-content: center;
       margin-top: 20px;
+    }
+
+    .row-widget.stButton > button {
+        background-color: #9a2c2c;
+        color: white;
     }
 
     </style>
@@ -164,4 +173,4 @@ if submit_button:
 
     fin_pd['Number of actions'] = fin_pd['Number of actions'].apply(lambda x: int(x))
     fin_pd.drop(columns = ['Weight'], inplace = True)
-    st.bar_chart(fin_pd.set_index('Ticker')['Number of actions'], width=300, height=270, color="#ff4b4b")
+    st.bar_chart(fin_pd.set_index('Ticker')['Number of actions'], width=300, height=270, color="#9a2c2c")
