@@ -74,7 +74,7 @@ st.markdown(
     }
 
     .row-widget.stButton > button {
-        background-color: #02852b;
+        background-color: #a10000;
         color: white;
     }
 
