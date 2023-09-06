@@ -74,8 +74,12 @@ st.markdown(
     }
 
     .row-widget.stButton > button {
-        background-color: #9a2c2c;
+        background-color: #02852b;
         color: white;
+    }
+
+    span[data-baseweb=tag] {
+        background-color: #02852b !important;
     }
 
     </style>
@@ -173,4 +177,4 @@ if submit_button:
 
     fin_pd['Number of actions'] = fin_pd['Number of actions'].apply(lambda x: int(x))
     fin_pd.drop(columns = ['Weight'], inplace = True)
-    st.bar_chart(fin_pd.set_index('Ticker')['Number of actions'], width=300, height=270, color="#9a2c2c")
+    st.bar_chart(fin_pd.set_index('Ticker')['Number of actions'], width=300, height=270, color="#02852b")
