@@ -63,6 +63,11 @@ st.markdown(
       background-repeat: no-repeat;
     }
 
+    .row-widget.stButton {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
 
     </style>
     """,
@@ -131,7 +136,7 @@ with right:
         else:
             FAMSTRUCT=5
 
-submit_button = st.button('Find my best portfolio and risk ', key='submit-asset_alloc_button' ,type="primary")
+submit_button = st.button('Find my best portfolio and risk ', type="primary")
 
 if submit_button:
     x_pred_data=dict(
