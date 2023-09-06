@@ -53,9 +53,7 @@ features = {
 
 # Define the layout
 st.title('Robo Advisor Dashboard')
-
 st.markdown('### Enter Investor and Investment Characteristics')
-
 st.markdown(
     """
     <style>
@@ -71,71 +69,70 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-age = st.slider('Age', min_value=features['AGE']['min'], max_value=features['AGE']['max'])
-gender = st.radio("Gender", ["Male", "Female"])
-marital_status = st.radio("Marital status", ["Married" , "Not married"])
-kids = st.slider('Number of children', min_value=0, max_value=9)
+left, right = st.columns(2)
 
-education_levels = {
-    'No high school diploma': 1,
-    'High school diploma': 2,
-    'College in progress': 3,
-    'College degree or higher': 4
-}
-education = st.selectbox("Education", [""] + list(education_levels.keys()), index=0)
+with left:
+    age = st.slider('Age', min_value=features['AGE']['min'], max_value=features['AGE']['max'])
+    gender = st.radio("Gender", ["Male", "Female"])
+    marital_status = st.radio("Marital status", ["Married" , "Not married"])
+    kids = st.slider('Number of children', min_value=0, max_value=9)
+    risk_willingness = st.checkbox("Are you willing to take risk?")
 
-occupation_levels = {
-    'Employee': 1,
-    'Self-employed or partnership': 2,
-    'Retired or disabled and +65': 3,
-    'Student, homemaker, or not working -65': 4,
-}
-occupation = st.selectbox("Occupation", [""] + list(occupation_levels.keys()), index=0)
+with right:
+    education_levels = {
+        'No high school diploma': 1,
+        'High school diploma': 2,
+        'College in progress': 3,
+        'College degree or higher': 4
+    }
+    education = st.selectbox("Education", [""] + list(education_levels.keys()), index=0)
 
-net_worth = st.text_input('Networth')
-income = st.text_input('Monthly income')
+    occupation_levels = {
+        'Employee': 1,
+        'Self-employed or partnership': 2,
+        'Retired or disabled and +65': 3,
+        'Student, homemaker, or not working -65': 4,
+    }
+    occupation = st.selectbox("Occupation", [""] + list(occupation_levels.keys()), index=0)
 
-savings_dict = {
-    'Have debts': 1,
-    'No saving, no debt': 2,
-    'Have savings': 3,
-}
-savings = st.selectbox("Savings", [""] + list(savings_dict.keys()), index=0)
+    savings_dict = {
+        'Have debts': 1,
+        'No saving, no debt': 2,
+        'Have savings': 3,
+    }
+    savings = st.selectbox("Savings", [""] + list(savings_dict.keys()), index=0)
 
-risk_willingness = st.checkbox("Are you willing to take risk?")
+    net_worth = st.text_input('Networth')
+    income = st.text_input('Monthly income')
 
-amount=st.text_input('Investment amount')
-n_days=st.text_input('Investment period')
-# Define dictionaries for gender and savings
-gender_dict = {
-    'Male': 1,
-    'Female': 2
-}
-marital_status_dict = {
-    'Married': 0,
-    'Not married': 1
-}
+    amount=st.text_input('Investment amount')
+    n_days=st.text_input('Investment period')
 
-if marital_status == "Not married":
-    if kids !=0 :
-        FAMSTRUCT=1
-    else :
-        if age <55:
-            FAMSTRUCT=2
-        else:
-            FAMSTRUCT=3
-else:
-    if kids!=0 :
-        FAMSTRUCT=4
+    gender_dict = {
+        'Male': 1,
+        'Female': 2
+    }
+    marital_status_dict = {
+        'Married': 0,
+        'Not married': 1
+    }
+
+    if marital_status == "Not married":
+        if kids !=0 :
+            FAMSTRUCT=1
+        else :
+            if age <55:
+                FAMSTRUCT=2
+            else:
+                FAMSTRUCT=3
     else:
-        FAMSTRUCT=5
-
-# Calculate x_pred_data based on user inputs
-
-
-
+        if kids!=0 :
+            FAMSTRUCT=4
+        else:
+            FAMSTRUCT=5
 
 submit_button = st.button('Find my best portfolio and risk ', key='submit-asset_alloc_button' ,type="primary")
+
 if submit_button:
     x_pred_data=dict(
     HHSEX= gender_dict.get(gender, 0),
