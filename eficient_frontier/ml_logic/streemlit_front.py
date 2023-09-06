@@ -58,7 +58,7 @@ st.markdown(
     """
     <style>
     .appview-container {
-      background-image: url('https://cutewallpaper.org/25/animated-purple-wallpaper/224215627.jpg');
+      background-image: url('https://4kwallpapers.com/images/wallpapers/purple-light-geometric-glowing-lines-minimalist-5k-5120x2880-6724.jpg');
       background-size: cover;
       background-repeat: no-repeat;
     }
@@ -136,7 +136,7 @@ with right:
         else:
             FAMSTRUCT=5
 
-submit_button = st.button('Find my best portfolio and risk ', type="primary")
+submit_button = st.button('Find my best portfolio and risk ')
 
 if submit_button:
     x_pred_data=dict(
