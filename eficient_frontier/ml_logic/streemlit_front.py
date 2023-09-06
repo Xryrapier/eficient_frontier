@@ -177,4 +177,20 @@ if submit_button:
 
     fin_pd['Number of actions'] = fin_pd['Number of actions'].apply(lambda x: int(x))
     fin_pd.drop(columns = ['Weight'], inplace = True)
-    st.bar_chart(fin_pd.set_index('Ticker')['Number of actions'], width=300, height=270, color="#02852b")
+
+    fig, ax = plt.subplots(figsize=(3, 2))
+    bars = ax.bar(fin_pd['Ticker'], fin_pd['Number of actions'], color="#02852b")
+    ax.set_xlabel('Ticker', fontsize=5)
+    ax.set_ylabel('Number of Stocks', fontsize=5)
+    ax.tick_params(axis='both', which='major', labelsize=5)
+
+    for i, bar in enumerate(bars):
+        height = bar.get_height()
+        ax.annotate(f'{height}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),
+                    textcoords="offset points",
+                    ha='center', va='bottom', fontsize=5)
+    new_max_y = fin_pd['Number of actions'].max() + 20
+    ax.set_ylim(0, new_max_y)
+
+    st.pyplot(fig)
