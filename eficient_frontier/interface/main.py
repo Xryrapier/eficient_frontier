@@ -163,7 +163,7 @@ if __name__ == '__main__':
         sigma = pred(X_pred)
 
         fin_pd, res = get_actions_opt_portfolio(ndays=10, invest=100000, sigma = sigma)
-        print(fin_pd)
+        print(res)
     except:
         extype, value, tb = sys.exc_info()
         traceback.print_exc()
