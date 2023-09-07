@@ -71,7 +71,7 @@ def predict(
     # among them dict, list, str, int, float, bool
     # in order to be able to convert the api response to JSON
 
-    return {'fin_pd': fin_pd,
+    return {'res': res,
             'sigma': list(sigma)}
 
 
