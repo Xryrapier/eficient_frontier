@@ -2,9 +2,6 @@ import copy
 import numpy as np
 from sklearn.model_selection import train_test_split
 from pandas.plotting import scatter_matrix
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
 from sklearn.model_selection import KFold, GridSearchCV
 from sklearn.linear_model import LinearRegression, Lasso, ElasticNet
 from sklearn.neighbors import KNeighborsRegressor
@@ -126,6 +123,3 @@ def load_and_evaluate_model(model_filename, X_validation, Y_validation):
     # Calculate and print performance metrics
     mse = mean_squared_error(Y_validation, predictions)
     r2 = r2_score(Y_validation, predictions)
-
-    #print("R^2 Score:", r2)
-    #print("Mean Squared Error:", mse)
