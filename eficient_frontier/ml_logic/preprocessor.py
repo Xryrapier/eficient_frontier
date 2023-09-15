@@ -5,14 +5,13 @@ import math
 import seaborn as sns
 import matplotlib.pyplot as plt
 pd.set_option('display.max_columns', None)
-from statsmodels.graphics.gofplots import qqplot
+
 from sklearn.preprocessing import RobustScaler, StandardScaler, MinMaxScaler
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
-from sklearn.impute import SimpleImputer, KNNImputer
+from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.compose import ColumnTransformer, make_column_transformer
-from sklearn.compose import make_column_selector
 
 
 def preprocess_features() -> ColumnTransformer:

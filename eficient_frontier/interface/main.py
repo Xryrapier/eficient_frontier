@@ -70,10 +70,6 @@ def get_actions_opt_portfolio(ndays, invest, sigma = None):
     maxSharpeReturn = res_portfolio[0][2]['Return']
     maxSharpeWeights = res_portfolio[0][2]['Weights']
 
-    #print ('Analysis resutls:')
-    #print ('Tickers: ', list(res_portfolio[1].columns))
-    #print ('Minimum risk return and weights:', minRiskReturn, minRiskWeights)
-    #print ('Max Sharpe ratio return and weights:', maxSharpeReturn, maxSharpeWeights)
     sel_tickers =  list(res_portfolio[1].columns)
     n_actions = get_portfolio_stock_components(minRiskWeights,sel_tickers, df, investment = invest)
     opt_portfolio = pd.DataFrame(np.vstack((sel_tickers,n_actions,np.round(minRiskWeights,2) )).T, columns = ['Ticker','Number of actions', 'Weight'] )
@@ -134,8 +130,8 @@ def preproces_train_evaluate_save_model():
     mse, r2 = evaluate_regression_model(model, X_test_preprocessed, y_test)
     print("Mean Squared Error:", mse)
     print("R^2 Score:", r2)
-    model_filename = 'finalized_model.sav'
-    preprocessor_filename = 'finalized_preprocessor.sav'
+    model_filename = 'models/finalized_model.sav'
+    preprocessor_filename = 'models/finalized_preprocessor.sav'
     save_model_to_pickle(model, model_filename)
     save_model_to_pickle(preprocessor, preprocessor_filename)
     print("✅ preprocessing and training and evaluating and saving model done")
@@ -143,9 +139,10 @@ def preproces_train_evaluate_save_model():
 
 def pred(X_pred: pd.DataFrame = None) -> np.ndarray:
     print("\n ⭐️  loading model and prediction" )
-    model_path_name = os.path.expanduser('~')+'/code/Xryrapier/eficient_frontier/finalized_model.sav'
+    model_path_name = 'models/finalized_model.sav'
+
     model = load(open(model_path_name, 'rb'))
-    preprocessor_path_name = os.path.expanduser('~')+'/code/Xryrapier/eficient_frontier/finalized_preprocessor.sav'
+    preprocessor_path_name ='models/finalized_preprocessor.sav'
     preprocessor = load(open(preprocessor_path_name, 'rb'))
 
     X_pred_preprocessed = preprocessor.transform(X_pred)
@@ -157,13 +154,7 @@ def pred(X_pred: pd.DataFrame = None) -> np.ndarray:
 
 if __name__ == '__main__':
     try:
-        X_pred=pd.DataFrame([[2, 32, 4, 1, 0, 5, 4, 2000, 6, 0, 8000]] ,\
-            columns=['HHSEX', 'AGE', 'EDCL', 'MARRIED', 'KIDS', 'FAMSTRUCT', 'OCCAT1','INCOME', 'WSAVED', 'YESFINRISK', 'NETWORTH'])
-        preproces_train_evaluate_save_model()
-        sigma = pred(X_pred)
-
-        fin_pd, res = get_actions_opt_portfolio(ndays=10, invest=100000, sigma = sigma)
-        print(res)
+        update_sp500_data()
     except:
         extype, value, tb = sys.exc_info()
         traceback.print_exc()

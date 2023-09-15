@@ -9,7 +9,6 @@ import requests
 import time
 
 
-
 features = {
     'HHSEX': {'female': 0, 'male': 1},
     'AGE': {'min': 17, 'max': 95},
@@ -27,28 +26,6 @@ features = {
     'YESFINRISK': {'yes': 1, 'no': 0},
     'NETWORTH': {}
 }
-
-
-
-# investors = pd.read_csv(ROOT_DIR+'/eficient_frontier/raw_data/InputData.csv', index_col = 0 )
-# assets = pd.read_csv(ROOT_DIR+'/eficient_frontier/raw_data/SP500Data.csv',index_col=0)
-# missing_fractions = assets.isnull().mean().sort_values(ascending=False)
-# drop_list = sorted(list(missing_fractions[missing_fractions > 0.3].index))
-# assets.drop(labels=drop_list, axis=1, inplace=True)
-# # Fill the missing values with the last value available in the dataset.
-# assets=assets.fillna(method='ffill')
-# options=np.array(assets.columns)
-# # str(options)
-# options = []
-# for tic in assets.columns:
-#     #{'label': 'user sees', 'value': 'script sees'}
-#     mydict = {}
-#     mydict['label'] = tic #Apple Co. AAPL
-#     mydict['value'] = tic
-#     options.append(mydict['label'])
-
-
-
 
 
 # Define the layout
@@ -156,7 +133,7 @@ with right:
 submit_button = st.button('Find my best portfolio and risk ')
 
 if submit_button:
-    x_pred_data=dict(
+    user_params=dict(
     HHSEX= gender_dict.get(gender, 0),
     AGE=age,
     EDCL=education_levels.get(education, 0),
@@ -167,13 +144,18 @@ if submit_button:
     INCOME=float(income),
     WSAVED=savings_dict.get(savings, 0),
     YESFINRISK=int(risk_willingness),
-    NETWORTH=float(net_worth))
+    NETWORTH=float(net_worth),
+    NDAYS=int(n_days),
+    AMOUNT=int(amount))
 
-    robo_advisor_api_url = 'http://127.0.0.1:8000/predict'
-    response = requests.get(robo_advisor_api_url, params=x_pred_data)
+    robo_advisor_api_url = 'https://eficientfrontierfinal-wjqgur6ida-ew.a.run.app/predict'
+    response = requests.get(robo_advisor_api_url, params=user_params)
     prediction = response.json()
+
     res=pd.DataFrame(prediction["res"])
+
     sigma =np.round(prediction["sigma"][0]*100,2)
+    print(sigma)
     st.text_input('Risk tolerance (Scale of 100)', value=sigma, key='risk_tolerance_input')
 
     st.markdown('#### Asset Allocation and Portfolio Performance')

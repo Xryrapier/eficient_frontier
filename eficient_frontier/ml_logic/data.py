@@ -1,9 +1,7 @@
 import pandas as pd
 from pathlib import Path
 from eficient_frontier.ml_logic.RTfuncs import *
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import RobustScaler
-from sklearn.preprocessing import OneHotEncoder
+
 
 
 def clean_data(data: pd.DataFrame) -> pd.DataFrame:

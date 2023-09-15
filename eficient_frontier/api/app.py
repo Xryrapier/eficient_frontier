@@ -31,7 +31,9 @@ app.add_middleware(
 # The trick is to load the model in memory when the Uvicorn server starts
 # and then store the model in an `app.state.model` global variable, accessible across all routes!
 # This will prove very useful for the Demo Day
-model_path_name = os.path.expanduser('~')+'/code/Xryrapier/eficient_frontier/finalized_model.sav'
+model_path_name = 'models/finalized_model.sav'
+# model_path_name = os.path.expanduser('~')+'/code/Xryrapier/eficient_frontier/finalized_model.sav'
+
 app.state.model = load(open(model_path_name, 'rb'))
 
 # $WIPE_END
@@ -49,7 +51,9 @@ def predict(
     INCOME: float,
     WSAVED: int,
     YESFINRISK: int,
-    NETWORTH: float
+    NETWORTH: float,
+    NDAYS: int,
+    AMOUNT: int
 ):
     """
     Make a single course prediction.
@@ -58,14 +62,11 @@ def predict(
     """
     # $CHA_BEGIN
 
-    # For test:
-    # X_pred=pd.DataFrame([[2, 32, 4, 1, 0, 5, 4, 2000, 6, 0, 8000]] ,\
-    #             columns=['HHSEX', 'AGE', 'EDCL', 'MARRIED', 'KIDS', 'FAMSTRUCT', 'OCCAT1','INCOME', 'WSAVED', 'YESFINRISK', 'NETWORTH'])
 
-    X_pred_api = pd.DataFrame(locals(), index=[0])
-
+    user_params = pd.DataFrame(locals(), index=[0])
+    X_pred_api = user_params.loc[: ,"HHSEX" : "NETWORTH"]
     sigma = pred(X_pred_api)
-    fin_pd, res = get_actions_opt_portfolio(ndays=20, invest=100000, sigma = sigma)
+    fin_pd, res = get_actions_opt_portfolio(ndays=user_params["NDAYS"][0], invest=user_params["AMOUNT"][0], sigma = sigma)
 
     # ⚠️ fastapi only accepts simple Python data types as a return value
     # among them dict, list, str, int, float, bool

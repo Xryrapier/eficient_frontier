@@ -3,19 +3,16 @@ from yahoo_fin.stock_info import get_data
 import numpy as np
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
-import pyarrow as pa
-import pyarrow.parquet as pq
 from tqdm import tqdm
 import itertools
 import cvxpy as cp
 import pickle as pkl
 from sklearn import metrics
 import warnings
-from datetime import datetime, timedelta
+from datetime import datetime
 from pandas.tseries.offsets import BDay
 import random
 import matplotlib as mpl
-import seaborn as sns
 from eficient_frontier.params import *
 # TODO: Document
 
@@ -39,7 +36,9 @@ def update_sp500_data():
         pkl.dump([tickers, ladj], f)
 
 def get_sp500_data ():
+    """ for building docker image comment the line below and un comment the line after"""
     with open(ROOT_DIR+'/eficient_frontier/raw_data/sp500_all.pkl', 'rb') as f:
+    # with open('sp500_all.pkl', 'rb') as f:
         sp500_all = pkl.load(f)
     return sp500_all[0], sp500_all[1]
 
@@ -176,29 +175,6 @@ def efficient_frontier_from_df(df, plot=False,npts = 80):
     max_weighted_sharpe_point = efficient_frontier_df.iloc[max_weighted_sharpe_idx]
 
 
-    #if plot:
-    #    # Create a Seaborn style context
-    #    sns.set(style="whitegrid")
-#
-    #    # Create the figure and axis
-    #    plt.figure(figsize=(10, 6))
-#
-    #    # Plot the efficient frontier and key points using Seaborn functions
-    #    sns.lineplot(data=efficient_frontier_df, x="Standard Deviation", y="Return", marker='o', label='Efficient Frontier')
-    #    plt.scatter(min_std_point[1], min_std_point[0], marker='o', color='r', label='Min Std Deviation')
-    #    sns.scatterplot(data=max_sharpe_point, x="Standard Deviation", y="Return", marker='o', color='g', label='Max Sharpe Ratio')
-    #    sns.scatterplot(data=max_weighted_sharpe_point, x="Standard Deviation", y="Return", marker='o', color='b', label='Max Weighted Sharpe Ratio')
-    #    plt.scatter(std, returns, marker='x', color='g', label='Actual Assets')
-#
-    #    # Set labels and title
-    #    plt.xlabel('Standard Deviation')
-    #    plt.ylabel('Expected Return')
-    #    plt.title('Efficient Frontier and Key Points')
-#
-    #    # Add legend and show the plot
-    #    plt.legend()
-    #    plt.show()
-
     if plot:
         # Plot efficient frontier and main dots
         plt.figure(figsize=(10, 6))
@@ -211,7 +187,6 @@ def efficient_frontier_from_df(df, plot=False,npts = 80):
         plt.ylabel('Expected Return (annualized)', fontsize=16)
         plt.title('Efficient Frontier', fontsize = 16)
         plt.legend(fontsize=12)
-        #plt.grid()
         plt.show()
 
     return [efficient_frontier_df, min_std_point, max_sharpe_point, max_weighted_sharpe_point]
@@ -233,7 +208,6 @@ def get_optimal_portfolio(ticker_list, ndays=180):
 
     # Correlation matrix
     correlation_matrix = df.corr(method="pearson")
-    #correlation_threshold = corr_ratio # Ajusta el umbral según tus preferencias
     combinations = list(itertools.combinations(ltick, 5))
     print(len(combinations))
 
@@ -244,12 +218,10 @@ def get_optimal_portfolio(ticker_list, ndays=180):
         selected_columns = list(combo)
         combo_correlation = correlation_matrix.loc[selected_columns, selected_columns]
         corr_means.append(combo_correlation.values.mean())
-
-        #if (combo_correlation.values.mean() <= correlation_threshold):
         combo_df = df[selected_columns].copy()
         selected_dataframes.append(combo_df)
 
-    n = 100
+    n = 2
 
     correlation_dataframes = list(zip(corr_means, selected_dataframes))
 
@@ -257,13 +229,9 @@ def get_optimal_portfolio(ticker_list, ndays=180):
 
     selected_dataframes = [df for _, df in sorted_correlation_dataframes[:n]]
 
-
-
     print("Number of selected combinations:", len(selected_dataframes))
     print('Minimum correlation: ', np.min(np.array(corr_means)))
-    #if only_corr:
-    #    return np.min(np.array(corr_means)), len(selected_dataframes)
-    #else:
+
     gather_results=[]
     print('Evaluating CLA for each combination')
     for itick in tqdm(selected_dataframes):
@@ -277,7 +245,6 @@ def get_optimal_portfolio(ticker_list, ndays=180):
     return res, selected_dataframes[idx],
 
 def get_portfolio_stock_components(minRiskWeights, sel_tickers,df, investment=1e5):
-    #sel_tickers = list(res_portfolio[1].columns)
     prices = []
     for tick in sel_tickers:
         prices.append(df[tick][-1])
@@ -287,14 +254,10 @@ def get_portfolio_stock_components(minRiskWeights, sel_tickers,df, investment=1e
         amount = investment * minRiskWeights[i]
         nac = round(amount/prices[i])
         n_actions.append(nac)
-    #print ('The advise is to invest:')
-    #for i in range(5):
-    #    print('%4i actions of %6s'%(n_actions[i], sel_tickers[i]))
     return n_actions
 
 
 def get_returns(sel_tickers, df,  minRiskWeights, dateini, ndays, investment=1e5):
-    #sel_tickers = list(res_portfolio[1].columns)
     datefin = dateini + BDay(ndays)
     n_actions = get_portfolio_stock_components(minRiskWeights,sel_tickers, df, investment=investment)
     prices_ini = []
@@ -313,7 +276,6 @@ def get_returns(sel_tickers, df,  minRiskWeights, dateini, ndays, investment=1e5
 
 
 def get_returns_tickers(sel_tickers, df,   minRiskWeights, dateini, ndays, investment=100_000):
-    #sel_tickers = list(res_portfolio[1].columns)
     datefin = dateini + BDay(ndays)
     n_actions = get_portfolio_stock_components(minRiskWeights,sel_tickers, df, investment=investment)
     prices_ini = []
@@ -397,10 +359,6 @@ def get_actions_opt_portfolio(ndays, invest, sigma = None):
     maxSharpeReturn = res_portfolio[0][2]['Return']
     maxSharpeWeights = res_portfolio[0][2]['Weights']
 
-    #print ('Analysis resutls:')
-    #print ('Tickers: ', list(res_portfolio[1].columns))
-    #print ('Minimum risk return and weights:', minRiskReturn, minRiskWeights)
-    #print ('Max Sharpe ratio return and weights:', maxSharpeReturn, maxSharpeWeights)
     sel_tickers =  list(res_portfolio[1].columns)
     n_actions = get_portfolio_stock_components(minRiskWeights,sel_tickers, df, investment = invest)
     opt_portfolio = pd.DataFrame(np.vstack((sel_tickers,n_actions,np.round(minRiskWeights,2) )).T, columns = ['Ticker','Number of actions', 'Weight'] )
