@@ -7,7 +7,7 @@ Welcome to our Predictive Investment Platform!
 Our tool allows users to input their personal data and investment preferences to receive precise recommendations. 
 We utilize an advanced Machine Learning algorithm designed to predict user risk tolerance and provide personalized financial guidance.
 Check out the aplication [here](https://roboadvisor.streamlit.app/)
-![alt text](images/dashboard.png)
+![alt text](Imagen for github.jpg)
 
 
 ## Data and Accuracy
